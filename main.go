@@ -1,6 +1,8 @@
 package main
 
 import (
+	"fmt"
+	"github.com/starbuy-commerce/auth-server/database"
 	login2 "github.com/starbuy-commerce/auth-server/login"
 	login "github.com/starbuy-commerce/auth-server/protobuf/protobuf_login"
 	token "github.com/starbuy-commerce/auth-server/protobuf/protobuf_token"
@@ -13,9 +15,14 @@ import (
 
 func main() {
 	port := os.Getenv("PORT")
-	listener, err := net.Listen("tcp", port)
+	listener, err := net.Listen("tcp", fmt.Sprintf("0.0.0.0:%v", os.Getenv("PORT")))
 	if err != nil {
 		log.Fatalf("Couldnt listen port %v: %v", port, err.Error())
+		return
+	}
+
+	if err := database.Connect(); err != nil {
+		log.Fatalf("Failed while connecting to database: %v", err.Error())
 		return
 	}
 
@@ -29,4 +36,5 @@ func main() {
 	}
 
 	defer listener.Close()
+	defer grpcServer.Stop()
 }

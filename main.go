@@ -30,6 +30,7 @@ func main() {
 	login.RegisterLoginServiceServer(grpcServer, &login2.Server{})
 	token.RegisterTokenValidationServiceServer(grpcServer, &token2.Server{})
 
+	log.Printf("\nServing gRPC service in port %v", os.Getenv("PORT"))
 	if err := grpcServer.Serve(listener); err != nil {
 		log.Fatalf("Couldnt serve port %v: %v", port, err.Error())
 		return

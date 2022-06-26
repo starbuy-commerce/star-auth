@@ -1,0 +1,16 @@
+syntax = "proto3";
+
+option go_package = "./protobuf_token";
+package token;
+
+message TokenValidationRequest {
+  string token = 1;
+}
+
+message TokenValidationResponse {
+  bool value = 1;
+}
+
+service TokenValidationService {
+  rpc ValidateToken(TokenValidationRequest) returns (TokenValidationResponse);
+}

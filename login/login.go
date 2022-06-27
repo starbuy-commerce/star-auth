@@ -4,6 +4,7 @@ import (
 	"context"
 	"database/sql"
 	"errors"
+	"fmt"
 	"github.com/starbuy-commerce/auth-server/authorization"
 	"github.com/starbuy-commerce/auth-server/database"
 	login "github.com/starbuy-commerce/auth-server/protobuf/protobuf_login"
@@ -20,6 +21,9 @@ type loginData struct {
 }
 
 func (s *Server) Login(ctx context.Context, request *login.LoginRequest) (*login.LoginResponse, error) {
+	fmt.Println("Debug: " + request.Username)
+	fmt.Println("Debug: " + request.Password)
+
 	db := database.GrabDB()
 	var userLogin loginData
 	if err := db.Get(&userLogin, "SELECT * FROM login WHERE username=$1", request.Username); err != nil {

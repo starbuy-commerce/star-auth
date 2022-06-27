@@ -20,18 +20,19 @@ type loginData struct {
 }
 
 func (s *Server) Login(ctx context.Context, request *login.LoginRequest) (*login.LoginResponse, error) {
-	db, user_login := database.GrabDB(), loginData{}
-	if err := db.Get(&user_login, "SELECT * FROM login WHERE username=$1", request.Username); err != nil {
+	db := database.GrabDB()
+	var userLogin loginData
+	if err := db.Get(&userLogin, "SELECT * FROM login WHERE username=$1", request.Username); err != nil {
 		if err == sql.ErrNoRows {
 			return nil, errors.New("Usuário não encontrado")
 		}
 	}
 
-	if err := security.ComparePassword(request.Password, user_login.Password); err != nil {
+	if err := security.ComparePassword(userLogin.Password, request.Password); err != nil {
 		return nil, errors.New("Senha incorreta")
 	}
 
-	token := authorization.GenerateToken(user_login.Username)
+	token := authorization.GenerateToken(userLogin.Username)
 	return &login.LoginResponse{
 		Message: "Sessão iniciada com sucesso",
 		Jwt:     token,

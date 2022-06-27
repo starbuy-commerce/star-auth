@@ -15,7 +15,7 @@ import (
 
 func main() {
 	port := os.Getenv("PORT")
-	listener, err := net.Listen("tcp", fmt.Sprintf("0.0.0.0:%v", os.Getenv("PORT")))
+	listener, err := net.Listen("tcp", fmt.Sprintf("0.0.0.0:%v", port))
 	if err != nil {
 		log.Fatalf("Couldnt listen port %v: %v", port, err.Error())
 		return

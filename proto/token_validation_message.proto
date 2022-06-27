@@ -9,6 +9,7 @@ message TokenValidationRequest {
 
 message TokenValidationResponse {
   bool value = 1;
+  string username = 2;
 }
 
 service TokenValidationService {

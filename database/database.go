@@ -1,7 +1,6 @@
 package database
 
 import (
-	"fmt"
 	"os"
 
 	"github.com/jmoiron/sqlx"
@@ -12,7 +11,6 @@ var db sqlx.DB
 
 func Connect() (err error) {
 	var database *sqlx.DB
-	fmt.Println(os.Getenv("DB_URI"))
 	if database, err = sqlx.Open("postgres", os.Getenv("DB_URI")); err != nil {
 		return err
 	}

@@ -1,16 +1,28 @@
 package token
 
 import (
-	"context"
+	"github.com/gin-gonic/gin"
 	"github.com/starbuy-commerce/auth-server/authorization"
-	token "github.com/starbuy-commerce/auth-server/protobuf/protobuf_token"
+	"net/http"
 )
 
-type Server struct {
-	token.UnimplementedTokenValidationServiceServer
+type tokenDTO struct {
+	Token string `json:"token"`
 }
 
-func (t *Server) ValidateToken(ctx context.Context, request *token.TokenValidationRequest) (*token.TokenValidationResponse, error) {
-	username, ok := authorization.ValidateToken(request.GetToken())
-	return &token.TokenValidationResponse{Username: username, Value: ok}, nil
+func ValidateToken(c *gin.Context) {
+
+	token := tokenDTO{}
+	if err := c.BindJSON(&token); err != nil {
+		c.AbortWithStatusJSON(http.StatusBadRequest, gin.H{"status": false, "message": "bad request", "user": "", "jwt": ""})
+		return
+	}
+
+	username, ok := authorization.ValidateToken(token.Token)
+	if !ok {
+		c.AbortWithStatusJSON(http.StatusBadRequest, gin.H{"status": false, "message": "Token inválido.", "user": "", "jwt": ""})
+		return
+	}
+
+	c.JSON(http.StatusBadRequest, gin.H{"status": false, "message": "Token válido", "user": username, "jwt": token})
 }

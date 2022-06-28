@@ -18,9 +18,9 @@ func ValidateToken(c *gin.Context) {
 		return
 	}
 
-	username, ok := authorization.ValidateToken(token.Token)
-	if !ok {
-		c.AbortWithStatusJSON(http.StatusBadRequest, gin.H{"status": false, "message": "Token inválido.", "user": "", "jwt": ""})
+	username, err := authorization.ExtractUser(c)
+	if err != nil {
+		c.AbortWithStatusJSON(http.StatusUnauthorized, gin.H{"status": false, "message": "invalid token"})
 		return
 	}
 

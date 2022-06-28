@@ -1,10 +1,13 @@
 package authorization
 
 import (
+	"errors"
 	"fmt"
+	"github.com/gin-gonic/gin"
 	"github.com/golang-jwt/jwt/v4"
 	"log"
 	"os"
+	"strings"
 	"time"
 )
 
@@ -42,4 +45,36 @@ func ValidateToken(tokenString string) (string, bool) {
 	}
 
 	return "", false
+}
+
+func extractToken(c *gin.Context) string {
+	raw := c.GetHeader("Authorization")
+
+	if len(strings.Split(raw, " ")) != 2 {
+		return ""
+	}
+	return strings.Split(raw, " ")[1]
+}
+
+func checkSecurityKey(token *jwt.Token) (interface{}, error) {
+	if _, ok := token.Method.(*jwt.SigningMethodHMAC); !ok {
+		return nil, fmt.Errorf("Unexpected signing method: %s", token.Header["alg"])
+	}
+
+	return []byte(os.Getenv("JWT_SIGN")), nil
+}
+
+func ExtractUser(c *gin.Context) (string, error) {
+	raw := extractToken(c)
+	token, err := jwt.Parse(raw, checkSecurityKey)
+	if err != nil {
+		return "", err
+	}
+
+	if claims, ok := token.Claims.(jwt.MapClaims); ok && token.Valid {
+		username := fmt.Sprintf("%v", claims["username"])
+		return username, nil
+	}
+
+	return "", errors.New("Invalid token")
 }
